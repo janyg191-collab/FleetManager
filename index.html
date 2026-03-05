@@ -388,7 +388,17 @@
   }
 
   async function ensureUserProfile(user){
-    await client.from("user_profiles").insert({ user_id:user.id, email:user.email, role:"user" }).catch(()=>{});
+    const { error: insertError } = await client
+  .from("user_profiles")
+  .insert({
+    user_id: user.id,
+    email: user.email,
+    role: "user"
+  });
+
+if(insertError){
+  console.log("profile existuje alebo insert chyba:", insertError.message);
+}
     const { data, error } = await client.from("user_profiles").select("role").eq("user_id",user.id).maybeSingle();
     if(error) throw error;
     return data?.role || "user";
@@ -932,3 +942,4 @@
 </script>
 </body>
 </html>
+
